@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { Toaster } from "@/components/ui/toaster";
 
 export default function AuthLayout({
   children,
@@ -17,6 +18,7 @@ export default function AuthLayout({
       <div className="flex items-center justify-center py-12">
         <div className="mx-auto grid w-[350px] gap-6">{children}</div>
       </div>
+      <Toaster />
     </div>
   );
 }
