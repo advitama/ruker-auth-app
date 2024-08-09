@@ -1,6 +1,12 @@
+import "@/assets/styles/index.css";
+import dynamic from "next/dynamic";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import "@/assets/styles/index.css";
+import { PHProvider } from "./providers/posthog";
+
+const PostHogPageView = dynamic(() => import("./views/posthog"), {
+  ssr: false,
+});
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -16,7 +22,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <PHProvider>
+        <body className={inter.className}>
+          <PostHogPageView />
+          {children}
+        </body>
+      </PHProvider>
     </html>
   );
 }
