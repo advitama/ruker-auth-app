@@ -9,7 +9,6 @@ const meta = {
     layout: "centered",
   },
   tags: ["autodocs"],
-  args: { onClick: fn() },
 } satisfies Meta<typeof Checkbox>;
 
 export default meta;
@@ -18,9 +17,9 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-      checked: false,
-      defaultChecked: false,
-      required: false,
-      onCheckedChange: fn(),
+    checked: false,
+    defaultChecked: false,
+    required: false,
+    onCheckedChange: fn(),
   },
 };
