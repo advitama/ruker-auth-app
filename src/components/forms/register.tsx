@@ -149,6 +149,7 @@ function RegisterForm({
                     {...field}
                     type="password"
                     placeholder="••••••••"
+                    autoComplete="new-password"
                     required
                   />
                 </FormControl>
