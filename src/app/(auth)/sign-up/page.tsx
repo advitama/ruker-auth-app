@@ -1,11 +1,17 @@
 // Import components from the Next.js
 import Link from "next/link";
+import type { Metadata } from "next";
 
 // Import PostHogClient
 import PostHogClient from "@/lib/posthog";
 
 // Import RegisterForm from the forms
 import RegisterForm from "@/components/forms/register";
+
+export const metadata: Metadata = {
+  title: "Sign up",
+  description: "Sign up for an account",
+};
 
 /*
  * The SignUpPage component is a form that allows users to sign up.
