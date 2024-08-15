@@ -30,22 +30,27 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { LoaderCircle } from "lucide-react";
 
 // Define the schema for the form
-const formSchema = z.object({
-  firstName: z.string(),
-  lastName: z.string(),
-  email: z.string().email(),
-  password: z.string().min(8),
-  confirmPassword: z.string().min(8),
-  isAgreed: z.boolean().optional(),
-});
+const formSchema = z
+  .object({
+    firstName: z.string(),
+    lastName: z.string(),
+    email: z.string().email(),
+    password: z.string().min(8),
+    confirmPassword: z.string().min(8),
+    isAgreed: z.boolean().optional(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
 
 /*
-    * The RegisterForm component is a form that allows users to sign up.
-    * It uses the useForm hook to create a form, and the zodResolver to validate the form.
-    * The onSubmit function is called when the form is submitted.
-    * The onGoogleSignUp function is called when the "Sign up with Google" button is clicked.
-    * The RegisterForm component takes a googleAuthflagEnabled prop that determines if the "Sign up with Google" button is displayed.
-*/
+ * The RegisterForm component is a form that allows users to sign up.
+ * It uses the useForm hook to create a form, and the zodResolver to validate the form.
+ * The onSubmit function is called when the form is submitted.
+ * The onGoogleSignUp function is called when the "Sign up with Google" button is clicked.
+ * The RegisterForm component takes a googleAuthflagEnabled prop that determines if the "Sign up with Google" button is displayed.
+ */
 function RegisterForm({
   googleAuthflagEnabled,
 }: {
