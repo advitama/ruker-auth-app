@@ -10,9 +10,8 @@ import { useState } from "react";
 // Import components from the shadcn/ui
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "@/components/ui/use-toast";
-
+import { Checkbox } from "@/components/ui/checkbox";
 
 // Import components from the shadcn/ui/form, zod, and react-hook-form
 import {
@@ -30,20 +29,23 @@ import { zodResolver } from "@hookform/resolvers/zod";
 // icon
 import { LoaderCircle } from "lucide-react";
 
+// Import the onLogin function from the hooks
+import { onLogin } from "@/hooks";
+
 // Define the schema for the form
 const formSchema = z.object({
   email: z.string().email(),
-  password: z.string().min(8),
+  password: z.string().min(8, { message: "Be at least 8 characters long" }),
   remember: z.boolean().optional(),
 });
 
 /*
-    * The LoginForm component is a form that allows users to login.
-    * It uses the useForm hook to create a form, and the zodResolver to validate the form.
-    * The onSubmit function is called when the form is submitted.
-    * The onGoogleLogin function is called when the "Login with Google" button is clicked.
-    * The LoginForm component takes a googleAuthflagEnabled prop that determines if the "Login with Google" button is displayed.
-*/
+ * The LoginForm component is a form that allows users to login.
+ * It uses the useForm hook to create a form, and the zodResolver to validate the form.
+ * The onSubmit function is called when the form is submitted.
+ * The onGoogleLogin function is called when the "Login with Google" button is clicked.
+ * The LoginForm component takes a googleAuthflagEnabled prop that determines if the "Login with Google" button is displayed.
+ */
 function LoginForm({
   googleAuthFlagEnabled,
 }: {
@@ -60,25 +62,39 @@ function LoginForm({
   // Define the onSubmit function
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setLoading(true);
-    toast({
-      title: "You submitted the following values:",
-      description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(values, null, 2)}</code>
-        </pre>
-      ),
-    });
-    // if (error) {
-    //   setLoading(false);
-    //   form.setError("email", {
-    //     type: "manual",
-    //     message: error as string,
-    //   });
-    //   form.setError("password", {
-    //     type: "manual",
-    //     message: error as string,
-    //   });
-    // }
+    await onLogin(values.email, values.password)
+      .then(() => {
+        toast({
+          title: "Login Successful",
+          description:
+            "You have successfully logged in to your account. Welcome back!",
+        });
+      })
+      .catch((error) => {
+        setLoading(false);
+        form.setError("email", {
+          type: "manual",
+          message: "Invalid email or password",
+        });
+        form.setError("password", {
+          type: "manual",
+          message: "Invalid email or password",
+        });
+        toast({
+          title: "Login Failed",
+          description: (
+            <>
+              <p>
+                {/* eslint-disable-next-line react/no-unescaped-entities */}
+                We couldn't log you in. Please check your email and password.
+              </p>
+              <p className="text-red-500 font-semibold mt-2">
+                {(error as Error).message}
+              </p>
+            </>
+          ),
+        });
+      });
   };
 
   // Define the onGoogleLogin function

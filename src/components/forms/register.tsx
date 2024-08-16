@@ -29,6 +29,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 // icon
 import { LoaderCircle } from "lucide-react";
 
+// Import the onSignUp function from the hooks
+import { onSignUp } from "@/hooks";
+
 // Define the schema for the form
 const formSchema = z
   .object({
@@ -77,43 +80,30 @@ function RegisterForm({
   // Define the onSubmit function
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setLoading(true);
-
-    try {
-      const response = await fetch("http://localhost:8080/register", {
-        method: "POST",
-        body: JSON.stringify({
-          first_name: values.firstName,
-          last_name: values.lastName,
-          email: values.email,
-          password: values.password,
-        }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      if (!response.ok) {
-        throw new Error("Email has already been taken");
-      }
+    await onSignUp(
+      values.firstName,
+      values.lastName,
+      values.email,
+      values.password
+    ).then(() => {
       toast({
         title: "Account Created Successfully",
         description: "Welcome aboard! Your account has been created 🎉",
       });
-    } catch (error) {
-      toast({
-        title: "Account Creation Failed",
-        description: (
-          <>
-            <p>
-              We encountered an error while creating your account. Please try
-              again later.
-            </p>
-            <p className="text-red-500 font-semibold mt-2">
-              {(error as Error).message}
-            </p>
-          </>
-        ),
-      });
-    }
+    }).catch((error) => {toast({
+      title: "Account Creation Failed",
+      description: (
+        <>
+          <p>
+            We encountered an error while creating your account. Please try
+            again later.
+          </p>
+          <p className="text-red-500 font-semibold mt-2">
+            {(error as Error).message}
+          </p>
+        </>
+      ),
+    });});
     setLoading(false);
   };
 
