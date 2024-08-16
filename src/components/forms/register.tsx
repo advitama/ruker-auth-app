@@ -35,8 +35,18 @@ const formSchema = z
     firstName: z.string(),
     lastName: z.string(),
     email: z.string().email(),
-    password: z.string().min(8),
-    confirmPassword: z.string().min(8),
+    password: z
+      .string()
+      .min(8, { message: "Be at least 8 characters long" })
+      .regex(/[a-zA-Z]/, { message: "Contain at least one letter." })
+      .regex(/[0-9]/, { message: "Contain at least one number." })
+      .regex(/[^a-zA-Z0-9]/, {
+        message: "Contain at least one special character.",
+      })
+      .trim(),
+    confirmPassword: z
+      .string()
+      .min(8, { message: "Be at least 8 characters long" }),
     isAgreed: z.boolean().optional(),
   })
   .refine((data) => data.password === data.confirmPassword, {
@@ -67,14 +77,44 @@ function RegisterForm({
   // Define the onSubmit function
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setLoading(true);
-    toast({
-      title: "You submitted the following values:",
-      description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(values, null, 2)}</code>
-        </pre>
-      ),
-    });
+
+    try {
+      const response = await fetch("http://localhost:8080/register", {
+        method: "POST",
+        body: JSON.stringify({
+          first_name: values.firstName,
+          last_name: values.lastName,
+          email: values.email,
+          password: values.password,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      if (!response.ok) {
+        throw new Error("Email has already been taken");
+      }
+      toast({
+        title: "Account Created Successfully",
+        description: "Welcome aboard! Your account has been created 🎉",
+      });
+    } catch (error) {
+      toast({
+        title: "Account Creation Failed",
+        description: (
+          <>
+            <p>
+              We encountered an error while creating your account. Please try
+              again later.
+            </p>
+            <p className="text-red-500 font-semibold mt-2">
+              {(error as Error).message}
+            </p>
+          </>
+        ),
+      });
+    }
+    setLoading(false);
   };
 
   // Define the onGoogleSignUp function
