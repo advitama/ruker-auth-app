@@ -12,16 +12,3 @@ export async function createSession(access_token: string) {
     path: "/",
   });
 }
-
-export async function getSession() {
-  return cookies().get("access_token");
-}
-
-export async function deleteSession() {
-  cookies().set("access_token", "", {
-    httpOnly: true,
-    secure: true,
-    expires: new Date(0),
-    sameSite: "lax",
-  });
-}

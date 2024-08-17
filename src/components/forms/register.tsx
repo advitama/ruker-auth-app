@@ -3,12 +3,16 @@
 // Import components from the Next.js
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 // Import hooks from React
 import { useState } from "react";
 
 // Import the axios instance
 import { AUTH_API } from "@/lib/axios";
+
+// Import createSession from the hooks/session.ts
+import { createSession } from "@/hooks/session";
 
 // Import components from the shadcn/ui
 import { Input } from "@/components/ui/input";
@@ -77,6 +81,9 @@ function RegisterForm({
     resolver: zodResolver(formSchema),
   });
 
+  // Use the useRouter hook to get the router
+  const router = useRouter();
+
   // Create a state to manage the loading
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -88,9 +95,13 @@ function RegisterForm({
         last_name: values.lastName,
         email: values.email,
         password: values.password,
-      }).catch((error) => {
-        throw new Error(error.response.data.message);
-      });
+      })
+        .then((response) => {
+          createSession(response.data.access_token);
+        })
+        .catch((error) => {
+          throw new Error(error.response.data.message);
+        });
     },
     onError: (error) => {
       toast({
@@ -118,7 +129,9 @@ function RegisterForm({
 
   // Define the onSubmit function
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    await mutateAsync(values);
+    await mutateAsync(values).then(() => {
+      router.push("/verify-email");
+    });
   };
 
   // Define the onGoogleSignUp function

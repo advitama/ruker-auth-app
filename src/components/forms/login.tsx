@@ -11,7 +11,7 @@ import { useState } from "react";
 import { AUTH_API } from "@/lib/axios";
 
 // Import the createSession hook
-import { createSession } from "@/hooks";
+import { createSession } from "@/hooks/session";
 
 // Import components from the shadcn/ui
 import { Input } from "@/components/ui/input";
