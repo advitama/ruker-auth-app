@@ -7,11 +7,17 @@ import Image from "next/image";
 // Import hooks from React
 import { useState } from "react";
 
+// Import the axios instance
+import { AUTH_API } from "@/lib/axios";
+
 // Import components from the shadcn/ui
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
 import { Checkbox } from "@/components/ui/checkbox";
+
+// Import hooks from the tanstack/react-query
+import { useMutation } from "@tanstack/react-query";
 
 // Import components from the shadcn/ui/form, zod, and react-hook-form
 import {
@@ -28,9 +34,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 // icon
 import { LoaderCircle } from "lucide-react";
-
-// Import the onSignUp function from the hooks
-import { onSignUp } from "@/hooks";
 
 // Define the schema for the form
 const formSchema = z
@@ -77,34 +80,45 @@ function RegisterForm({
   // Create a state to manage the loading
   const [loading, setLoading] = useState<boolean>(false);
 
-  // Define the onSubmit function
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    setLoading(true);
-    await onSignUp(
-      values.firstName,
-      values.lastName,
-      values.email,
-      values.password
-    ).then(() => {
+  // Create a mutation to handle the sign up
+  const { mutateAsync, isPending } = useMutation({
+    mutationFn: async (values: z.infer<typeof formSchema>) => {
+      await AUTH_API.post("/register", {
+        first_name: values.firstName,
+        last_name: values.lastName,
+        email: values.email,
+        password: values.password,
+      }).catch((error) => {
+        throw new Error(error.response.data.message);
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Account Creation Failed",
+        description: (
+          <>
+            <p>
+              We encountered an error while creating your account. Please try
+              again later.
+            </p>
+            <p className="text-red-500 font-semibold mt-2">
+              {(error as Error).message}
+            </p>
+          </>
+        ),
+      });
+    },
+    onSuccess: () => {
       toast({
         title: "Account Created Successfully",
         description: "Welcome aboard! Your account has been created 🎉",
       });
-    }).catch((error) => {toast({
-      title: "Account Creation Failed",
-      description: (
-        <>
-          <p>
-            We encountered an error while creating your account. Please try
-            again later.
-          </p>
-          <p className="text-red-500 font-semibold mt-2">
-            {(error as Error).message}
-          </p>
-        </>
-      ),
-    });});
-    setLoading(false);
+    },
+  });
+
+  // Define the onSubmit function
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    await mutateAsync(values);
   };
 
   // Define the onGoogleSignUp function
@@ -233,7 +247,7 @@ function RegisterForm({
             )}
           />
           <div className="mt-2 space-y-3">
-            {loading ? (
+            {isPending ? (
               <Button className="w-full" disabled>
                 <LoaderCircle className="animate-spin" />
               </Button>
