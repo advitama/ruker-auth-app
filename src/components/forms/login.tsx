@@ -3,6 +3,7 @@
 // Import components from the Next.js
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 // Import hooks from React
 import { useState } from "react";
@@ -62,6 +63,9 @@ function LoginForm({
     resolver: zodResolver(formSchema),
   });
 
+  // Use the useRouter hook to get the router
+  const router = useRouter();
+
   // Create a state to manage the loading
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -110,7 +114,9 @@ function LoginForm({
 
   // Define the onSubmit function
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    await mutateAsync(values);
+    await mutateAsync(values).then(() => {
+      router.push("/");
+    });
   };
 
   // Define the onGoogleLogin function

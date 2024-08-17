@@ -42,7 +42,7 @@ export default async function middleware(req: NextRequest) {
     }
   }
 
-  if (is_verified && path === "/verify-email") {
+  if (is_verified) {
     return NextResponse.redirect(new URL("/", req.nextUrl));
   }
 
