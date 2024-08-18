@@ -12,3 +12,7 @@ export async function createSession(access_token: string) {
     path: "/",
   });
 }
+
+export async function getAccessToken() {
+  return cookies().get("access_token");
+}
