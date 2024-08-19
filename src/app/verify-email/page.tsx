@@ -5,9 +5,8 @@ import TypingAnimation from "@/components/magicui/typing-animation";
 import ConfirmEmailForm from "@/components/forms/confirm-email";
 
 export const metadata: Metadata = {
-    title: "Verify your Email"
-    
-}
+  title: "Verify your Email",
+};
 
 export default function ConfirmEmailPage() {
   return (
@@ -24,16 +23,6 @@ export default function ConfirmEmailPage() {
           </p>
         </div>
         <ConfirmEmailForm />
-        <div className="text-center text-sm text-muted-foreground">
-          Didn't receive the code?{" "}
-          <Link
-            href="#"
-            className="font-medium text-primary hover:underline"
-            prefetch={false}
-          >
-            Resend confirmation email
-          </Link>
-        </div>
       </div>
     </div>
   );
