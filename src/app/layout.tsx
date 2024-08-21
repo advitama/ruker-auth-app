@@ -3,6 +3,8 @@ import dynamic from "next/dynamic";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { PHProvider } from "./providers/posthog";
+import { ThemeProvider } from "./providers/theme";
+
 
 const PostHogPageView = dynamic(() => import("./views/posthog"), {
   ssr: false,
@@ -21,11 +23,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <PHProvider>
         <body className={inter.className}>
           <PostHogPageView />
-          {children}
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            storageKey="theme"
+            disableTransitionOnChange
+            enableSystem
+          >
+            {children}
+          </ThemeProvider>
         </body>
       </PHProvider>
     </html>
