@@ -6,7 +6,7 @@ import type { Metadata } from "next";
 import PostHogClient from "@/lib/posthog";
 
 // Import RegisterForm from the forms
-import RegisterForm from "@/components/forms/register";
+import RegisterForm from "@/features/register/components/form/register";
 
 export const metadata: Metadata = {
   title: "Sign up",
