@@ -1,52 +1,50 @@
 import { env } from "./config/env";
-import { cookies } from "next/headers";
 import { AUTH_API } from "./lib/axios";
 import { NextRequest, NextResponse } from "next/server";
 
-const protectedRoutes = ["/verify-email"];
-const publicRoutes = ["/login", "/sign-up", "/forgot-password"];
+const routes = {
+  protected: ["/verify-email"],
+  public: ["/login", "/sign-up", "/forgot-password"],
+};
 
 export default async function middleware(req: NextRequest) {
-  const path = req.nextUrl.pathname;
-  const isProtectedRoute = protectedRoutes.includes(path);
-  const isPublicRoute = publicRoutes.includes(path);
+  const { pathname } = req.nextUrl;
+  const isProtectedRoute = routes.protected.includes(pathname);
+  const isPublicRoute = routes.public.includes(pathname);
+  const accessToken = req.cookies.get("access_token")?.value;
 
-  const access_token = cookies().get("access_token")?.value;
-
-  let is_verified = false;
-
-  if (access_token) {
-    try {
-      const response = await AUTH_API.get("/profile", {
-        headers: {
-          Authorization: `Bearer ${access_token}`,
-        },
-      });
-      is_verified = response.data.verified;
-
-      if (!is_verified && isProtectedRoute) {
-        if (path !== "/verify-email") {
-          return NextResponse.redirect(new URL("/verify-email", req.nextUrl));
-        }
-      } else if (isPublicRoute && path !== "/verify-email" && !is_verified) {
-        return NextResponse.redirect(new URL("/verify-email", req.nextUrl));
-      }
-    } catch (error) {
-      console.error("Error fetching profile:", error);
-      if (isProtectedRoute && path !== "/login") {
-        return NextResponse.redirect(new URL("/login", req.nextUrl));
-      }
-    }
-  } else {
-    if (isProtectedRoute && path !== "/login") {
+  if (!accessToken) {
+    if (isProtectedRoute && pathname !== "/login") {
       return NextResponse.redirect(new URL("/login", req.nextUrl));
     }
+    return NextResponse.next();
   }
 
-  if (is_verified) {
-    return NextResponse.redirect(
-      new URL(env.NEXT_PUBLIC_DASHBOARD_APP_URL, req.nextUrl)
-    );
+  AUTH_API.defaults.headers.Authorization = `Bearer ${accessToken}`;
+
+  try {
+    const { data } = await AUTH_API.get("/profile");
+    const isVerified = data.verified;
+
+    if (!isVerified) {
+      if (isProtectedRoute && pathname !== "/verify-email") {
+        return NextResponse.redirect(new URL("/verify-email", req.nextUrl));
+      }
+      if (isPublicRoute && pathname !== "/verify-email") {
+        return NextResponse.redirect(new URL("/verify-email", req.nextUrl));
+      }
+    }
+
+    if (isVerified && pathname !== "/verify-email") {
+      return NextResponse.redirect(
+        new URL(env.NEXT_PUBLIC_DASHBOARD_APP_URL, req.nextUrl)
+      );
+    }
+  } catch (error) {
+    console.error("Error fetching profile:", error);
+    if (isProtectedRoute && pathname !== "/login") {
+      return NextResponse.redirect(new URL("/login", req.nextUrl));
+    }
   }
 
   return NextResponse.next();
