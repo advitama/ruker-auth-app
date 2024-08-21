@@ -8,6 +8,9 @@ import { useRouter } from "next/navigation";
 // Import hooks from React
 import { useState } from "react";
 
+// Import the env object
+import { env } from "@/config/env";
+
 // Import the axios instance
 import { AUTH_API } from "@/lib/axios";
 
@@ -115,7 +118,7 @@ function LoginForm({
   // Define the onSubmit function
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     await mutateAsync(values).then(() => {
-      router.push("/");
+      router.push(env.NEXT_PUBLIC_DASHBOARD_APP_URL);
     });
   };
 

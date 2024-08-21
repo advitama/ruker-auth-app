@@ -1,3 +1,4 @@
+import { env } from "./config/env";
 import { cookies } from "next/headers";
 import { AUTH_API } from "./lib/axios";
 import { NextRequest, NextResponse } from "next/server";
@@ -43,7 +44,9 @@ export default async function middleware(req: NextRequest) {
   }
 
   if (is_verified) {
-    return NextResponse.redirect(new URL("/", req.nextUrl));
+    return NextResponse.redirect(
+      new URL(env.NEXT_PUBLIC_DASHBOARD_APP_URL, req.nextUrl)
+    );
   }
 
   return NextResponse.next();
