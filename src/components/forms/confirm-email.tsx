@@ -1,7 +1,13 @@
 "use client";
 
+// Import the env object from the config/env
+import { env } from "@/config/env";
+
 // Import the axios instance
 import { AUTH_API } from "@/lib/axios";
+
+// Import the useRouter hook from the next/router
+import { useRouter } from "next/navigation";
 
 // Import hooks from the tanstack/react-query
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -61,6 +67,8 @@ function ConfirmEmailForm() {
     },
   });
 
+  const router = useRouter();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
   });
@@ -91,6 +99,8 @@ function ConfirmEmailForm() {
     await mutateAsync({
       id: data.id,
       verification_number: values.verification_number,
+    }).then(() => {
+      router.push(env.NEXT_PUBLIC_DASHBOARD_APP_URL);
     });
   };
 
