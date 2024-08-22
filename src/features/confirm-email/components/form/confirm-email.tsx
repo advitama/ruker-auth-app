@@ -30,9 +30,6 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
 
-// Import getAccessToken hook
-import { getAccessToken } from "@/hooks/session";
-
 // Icon
 import { LoaderCircle } from "lucide-react";
 
@@ -57,12 +54,7 @@ function ConfirmEmailForm() {
   const { data, isFetched } = useQuery({
     queryKey: ["profile"],
     queryFn: async () => {
-      const accessToken = await getAccessToken();
-      const response = await AUTH_API.get("/profile", {
-        headers: {
-          Authorization: `Bearer ${accessToken?.value}`,
-        },
-      });
+      const response = await AUTH_API.get("/profile");
       return response.data;
     },
   });
@@ -74,10 +66,11 @@ function ConfirmEmailForm() {
   });
 
   const { mutateAsync, isPending } = useMutation({
-    mutationFn: async (data: { id: string; verification_number: string }) =>
+    mutationFn: async (data: { id: string; verification_number: string }) => {
       await AUTH_API.post("confirm-email", data).catch((error) => {
         throw error.response.data;
-      }),
+      });
+    },
     onSuccess: () => {
       toast({
         title: "Success",
@@ -105,13 +98,7 @@ function ConfirmEmailForm() {
   };
 
   const onResendConfirmationEmail = async () => {
-    const accessToken = await getAccessToken();
-
-    AUTH_API.get("/resend-confirmation-email", {
-      headers: {
-        Authorization: `Bearer ${accessToken?.value}`,
-      },
-    })
+    AUTH_API.get("/resend-confirmation-email")
       .then(() => {
         toast({
           title: "Resend Confirmation Email",
