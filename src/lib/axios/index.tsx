@@ -1,6 +1,7 @@
 "use client";
 
 import { env } from "@/config/env";
+import { toast } from "@/components/ui/use-toast";
 import { getAccessToken } from "@/hooks/session";
 import axios, { InternalAxiosRequestConfig } from "axios";
 
@@ -21,6 +22,21 @@ AUTH_API.interceptors.request.use(
     return config;
   },
   (error) => {
+    return Promise.reject(error);
+  }
+);
+
+AUTH_API.interceptors.response.use(
+  (response) => {
+    return response.data;
+  },
+  (error) => {
+    const message = error.response?.data?.message || error.message;
+    toast({
+      title: "Error",
+      description: message,
+    });
+
     return Promise.reject(error);
   }
 );
