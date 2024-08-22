@@ -14,5 +14,5 @@ export async function createSession(access_token: string) {
 }
 
 export async function getAccessToken() {
-  return cookies().get("access_token");
+  return cookies().get("access_token")?.value;
 }
