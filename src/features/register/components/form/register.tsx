@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 // Import the axios instance
-import { AUTH_API } from "@/lib/axios";
+import AUTH_API from "@/lib/axios/auth";
 
 // Import createSession from the hooks/session.ts
 import { createSession } from "@/hooks/session";
@@ -35,6 +35,9 @@ import {
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+
+// Import types
+import { Authenticated } from "@/types/auth";
 
 // icon
 import { LoaderCircle } from "lucide-react";
@@ -90,20 +93,22 @@ function RegisterForm({
   // Create a mutation to handle the sign up
   const { mutateAsync, isPending } = useMutation({
     mutationFn: async (values: z.infer<typeof formSchema>) => {
-      await AUTH_API.post("/register", {
-        first_name: values.firstName,
-        last_name: values.lastName,
-        email: values.email,
-        password: values.password,
-      })
-        .then((response) => {
-          createSession(response.data.access_token);
-        })
-        .catch((error) => {
-          throw new Error(error.response.data.message);
+      try {
+        const response: Authenticated = await AUTH_API.post("/register", {
+          first_name: values.firstName,
+          last_name: values.lastName,
+          email: values.email,
+          password: values.password,
         });
+
+        await createSession(response.access_token, false).then(() => {
+          router.push("/verify-email");
+        });
+      } catch (error) {
+        throw new Error((error as any).response?.data?.message);
+      }
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       toast({
         title: "Account Creation Failed",
         description: (
@@ -112,9 +117,7 @@ function RegisterForm({
               We encountered an error while creating your account. Please try
               again later.
             </p>
-            <p className="text-red-500 font-semibold mt-2">
-              {(error as Error).message}
-            </p>
+            <p className="text-red-500 font-semibold mt-2">{error.message}</p>
           </>
         ),
       });
