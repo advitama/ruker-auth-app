@@ -4,7 +4,7 @@
 import { env } from "@/config/env";
 
 // Import the axios instance
-import { AUTH_API } from "@/lib/axios";
+import AUTH_API from "@/lib/axios/auth";
 
 // Import the useRouter hook from the next/router
 import { useRouter } from "next/navigation";
@@ -33,6 +33,9 @@ import { toast } from "@/components/ui/use-toast";
 // Icon
 import { LoaderCircle } from "lucide-react";
 
+// Import types
+import { User } from "@/types/auth";
+
 const formSchema = z.object({
   verification_number: z.string(),
 });
@@ -54,8 +57,8 @@ function ConfirmEmailForm() {
   const { data, isFetched } = useQuery({
     queryKey: ["profile"],
     queryFn: async () => {
-      const response = await AUTH_API.get("/profile");
-      return response.data;
+      const response: User = await AUTH_API.get("/profile");
+      return response;
     },
   });
 
@@ -90,7 +93,7 @@ function ConfirmEmailForm() {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     await mutateAsync({
-      id: data.id,
+      id: data?.id || '',
       verification_number: values.verification_number,
     }).then(() => {
       router.push(env.NEXT_PUBLIC_DASHBOARD_APP_URL);

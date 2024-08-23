@@ -3,11 +3,11 @@
 import "server-only";
 import { cookies } from "next/headers";
 
-export async function createSession(access_token: string) {
+export async function createSession(access_token: string, is_remember: boolean) {
   cookies().set("access_token", access_token, {
     httpOnly: true,
     secure: true,
-    expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
+    expires:  is_remember ? new Date(Date.now() + 1000 * 60 * 60 * 24 * 7) : undefined,
     sameSite: "lax",
     path: "/",
   });

@@ -1,11 +1,11 @@
 "use client";
 
 import { env } from "@/config/env";
-import { toast } from "@/components/ui/use-toast";
 import { getAccessToken } from "@/hooks/session";
+import { toast } from "@/components/ui/use-toast";
 import axios, { InternalAxiosRequestConfig } from "axios";
 
-export const AUTH_API = axios.create({
+const AUTH_API = axios.create({
   baseURL: env.NEXT_PUBLIC_AUTH_API_URL,
   headers: {
     "Content-Type": "application/json",
@@ -36,7 +36,9 @@ AUTH_API.interceptors.response.use(
       title: "Error",
       description: message,
     });
-
+    
     return Promise.reject(error);
   }
 );
+
+export default AUTH_API;

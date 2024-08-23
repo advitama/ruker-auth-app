@@ -1,5 +1,6 @@
 import { env } from "./config/env";
-import { AUTH_API } from "./lib/axios";
+import { User } from "@/types/auth";
+import AUTH_API from "./lib/axios/auth";
 import { NextRequest, NextResponse } from "next/server";
 
 const routes = {
@@ -23,8 +24,8 @@ export default async function middleware(req: NextRequest) {
   AUTH_API.defaults.headers.Authorization = `Bearer ${accessToken}`;
 
   try {
-    const { data } = await AUTH_API.get("/profile");
-    const isVerified = data.verified;
+    const response: User = await AUTH_API.get("/profile");
+    const isVerified = response.verified;
 
     if (!isVerified) {
       if (isProtectedRoute && pathname !== "/verify-email") {

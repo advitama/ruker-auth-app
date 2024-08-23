@@ -12,7 +12,7 @@ import { useState } from "react";
 import { env } from "@/config/env";
 
 // Import the axios instance
-import { AUTH_API } from "@/lib/axios";
+import AUTH_API from "@/lib/axios/auth";
 
 // Import the createSession hook
 import { createSession } from "@/hooks/session";
@@ -42,6 +42,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 // icon
 import { LoaderCircle } from "lucide-react";
 
+// Import types
+import { Authenticated } from "@/types/auth";
+
 // Define the schema for the form
 const formSchema = z.object({
   email: z.string().email(),
@@ -64,6 +67,9 @@ function LoginForm({
   // Use the useForm hook to create a form
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
+    defaultValues: {
+      remember: false,
+    },
   });
 
   // Use the useRouter hook to get the router
@@ -74,13 +80,13 @@ function LoginForm({
 
   const { mutateAsync, isPending } = useMutation({
     mutationFn: async (value: z.infer<typeof formSchema>) => {
-      await AUTH_API.post("/login", value)
-        .then((response) => {
-          createSession(response.data.access_token);
-        })
-        .catch((error) => {
-          throw new Error(error.response.data.message);
-        });
+      try {
+        const response: Authenticated = await AUTH_API.post("/login", value);
+
+        createSession(response.access_token, value.remember || false);
+      } catch (error) {
+        throw new Error((error as any).response?.data?.message);
+      }
     },
     onSuccess: () => {
       toast({
