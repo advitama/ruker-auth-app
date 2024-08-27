@@ -1,14 +1,18 @@
+import { cn } from "@/utils";
 import "@/assets/styles/index.css";
 import dynamic from "next/dynamic";
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import { PHProvider } from "./providers/posthog";
+import { Inter as FontSans } from "next/font/google";
 
 const PostHogPageView = dynamic(() => import("./views/posthog"), {
   ssr: false,
 });
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
+const fontSans = FontSans({
+  subsets: ["latin"],
+  variable: "--font-sans",
+});
 
 export const metadata: Metadata = {
   title: "Ruker",
@@ -23,7 +27,12 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <PHProvider>
-        <body className={inter.className}>
+        <body
+          className={cn(
+            "min-h-screen bg-background font-sans antialiased",
+            fontSans.variable
+          )}
+        >
           <PostHogPageView />
           {children}
         </body>
