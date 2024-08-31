@@ -27,6 +27,7 @@ import { useMutation } from "@tanstack/react-query";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -218,6 +219,11 @@ function RegisterForm({
                     required
                   />
                 </FormControl>
+                <FormDescription>
+                  Password must be at least 8 characters long and contain at
+                  least one letter, one number and one special character.
+                </FormDescription>
+
                 <FormMessage />
               </FormItem>
             )}

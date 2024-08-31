@@ -30,7 +30,7 @@ export default async function SignUpPage() {
     <>
       <div className="grid gap-2 text-center">
         <h1 className="text-3xl font-bold">Sign up</h1>
-        <p className="text-xs text-balance text-muted-foreground">
+        <p className="text-balance text-muted-foreground">
           Enter your information to create an account
         </p>
       </div>
