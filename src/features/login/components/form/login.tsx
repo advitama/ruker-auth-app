@@ -198,7 +198,7 @@ function LoginForm({
             />
             <Link
               href="/forgot-password"
-              className="ml-auto inline-block text-xs underline"
+              className="ml-auto inline-block text-sm underline"
             >
               Forgot your password?
             </Link>
