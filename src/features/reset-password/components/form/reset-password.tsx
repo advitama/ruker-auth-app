@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 // Import API
-import AUTH_API from "@/lib/axios/auth";
+import AUTH_API from "@/lib/api/auth";
 
 // Import components
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -30,8 +30,10 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { toast } from "@/components/ui/use-toast";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+
+// import use toast hook
+import { useToast } from "@/hooks/use-toast";
 
 // Import icons
 import { ArrowLeft, LoaderCircle } from "lucide-react";
@@ -58,10 +60,10 @@ const formSchema = z
   });
 
 /*
-  * The ResetPasswordForm component is a form that allows users to reset their password.
-  * It uses the useForm hook to create a form, and the zodResolver to validate the form.
-  * The onSubmit function is called when the form is submitted.
-*/ 
+ * The ResetPasswordForm component is a form that allows users to reset their password.
+ * It uses the useForm hook to create a form, and the zodResolver to validate the form.
+ * The onSubmit function is called when the form is submitted.
+ */
 export function ResetPasswordForm({ token }: { token: string }) {
   // Use the useForm hook to create a form
   const form = useForm<z.infer<typeof formSchema>>({
@@ -70,6 +72,8 @@ export function ResetPasswordForm({ token }: { token: string }) {
 
   // Use the useRouter hook to get the router object
   const router = useRouter();
+
+  const { toast } = useToast();
 
   // Use the useQuery hook to fetch
   const { data } = useQuery({

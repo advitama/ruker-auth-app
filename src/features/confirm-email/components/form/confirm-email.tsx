@@ -4,7 +4,7 @@
 import { env } from "@/config/env";
 
 // Import the axios instance
-import AUTH_API from "@/lib/axios/auth";
+import AUTH_API from "@/lib/api/auth";
 
 // Import the useRouter hook from the next/router
 import { useRouter } from "next/navigation";
@@ -28,7 +28,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 // Import components from the shadcn/ui
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { toast } from "@/components/ui/use-toast";
+
+// import use toast hook
+import { useToast } from "@/hooks/use-toast";
 
 // Icon
 import { LoaderCircle } from "lucide-react";
@@ -63,6 +65,7 @@ function ConfirmEmailForm() {
   });
 
   const router = useRouter();
+  const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -93,7 +96,7 @@ function ConfirmEmailForm() {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     await mutateAsync({
-      id: data?.id || '',
+      id: data?.id || "",
       verification_number: values.verification_number,
     }).then(() => {
       router.push(env.NEXT_PUBLIC_DASHBOARD_APP_URL);

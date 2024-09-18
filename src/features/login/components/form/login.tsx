@@ -12,16 +12,18 @@ import { useState } from "react";
 import { env } from "@/config/env";
 
 // Import the axios instance
-import AUTH_API from "@/lib/axios/auth";
+import AUTH_API from "@/lib/api/auth";
 
 // Import the createSession hook
-import { createSession } from "@/hooks/session";
+import { createSession } from "@/utils/functions/session";
 
 // Import components from the shadcn/ui
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { toast } from "@/components/ui/use-toast";
 import { Checkbox } from "@/components/ui/checkbox";
+
+// import use toast hook
+import { useToast } from "@/hooks/use-toast";
 
 // Import hooks from the tanstack/react-query
 import { useMutation } from "@tanstack/react-query";
@@ -74,6 +76,7 @@ function LoginForm({
 
   // Use the useRouter hook to get the router
   const router = useRouter();
+  const { toast } = useToast();
 
   // Create a state to manage the loading
   const [loading, setLoading] = useState<boolean>(false);
@@ -82,7 +85,6 @@ function LoginForm({
     mutationFn: async (value: z.infer<typeof formSchema>) => {
       try {
         const response: Authenticated = await AUTH_API.post("/login", value);
-
         createSession(response.access_token, value.remember || false);
       } catch (error) {
         throw new Error((error as any).response?.data?.message);

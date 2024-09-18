@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
 
 // Import API
-import AUTH_API from "@/lib/axios/auth";
+import AUTH_API from "@/lib/api/auth";
 
 // Import components
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -41,12 +41,11 @@ const formSchema = z.object({
   email: z.string().email(),
 });
 
-
 /*
-  * The ForgotPasswordForm component is a form that allows users to reset their password.
-  * It uses the useForm hook to create a form, and the zodResolver to validate the form.
-  * The onSubmit function is called when the form is submitted.
-*/ 
+ * The ForgotPasswordForm component is a form that allows users to reset their password.
+ * It uses the useForm hook to create a form, and the zodResolver to validate the form.
+ * The onSubmit function is called when the form is submitted.
+ */
 export function ForgotPasswordForm() {
   // Use the useRouter hook to get the router object
   const router = useRouter();

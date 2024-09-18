@@ -1,9 +1,11 @@
 "use client";
 
 import { env } from "@/config/env";
-import { getAccessToken } from "@/hooks/session";
-import { toast } from "@/components/ui/use-toast";
 import axios, { InternalAxiosRequestConfig } from "axios";
+import { getAccessToken } from "@/utils/functions/session";
+
+// import use toast hook
+import { useToast } from "@/hooks/use-toast";
 
 const AUTH_API = axios.create({
   baseURL: env.NEXT_PUBLIC_AUTH_API_URL,
@@ -15,7 +17,7 @@ const AUTH_API = axios.create({
 // Add a request interceptor to set the Authorization header
 AUTH_API.interceptors.request.use(
   async (config: InternalAxiosRequestConfig) => {
-    const token = await getAccessToken(); // fetch the token dynamically
+    const token = await getAccessToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -32,11 +34,13 @@ AUTH_API.interceptors.response.use(
   },
   (error) => {
     const message = error.response?.data?.message || error.message;
+    const { toast } = useToast();
+
     toast({
       title: "Error",
       description: message,
     });
-    
+
     return Promise.reject(error);
   }
 );

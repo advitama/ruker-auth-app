@@ -1,6 +1,6 @@
 import { env } from "./config/env";
 import { User } from "@/types/auth";
-import AUTH_API from "./lib/axios/auth";
+import AUTH_API from "./lib/api/auth";
 import { NextRequest, NextResponse } from "next/server";
 
 const routes = {

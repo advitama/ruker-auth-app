@@ -9,16 +9,18 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 // Import the axios instance
-import AUTH_API from "@/lib/axios/auth";
+import AUTH_API from "@/lib/api/auth";
 
-// Import createSession from the hooks/session.ts
-import { createSession } from "@/hooks/session";
+// Import createSession
+import { createSession } from "@/utils/functions/session";
 
 // Import components from the shadcn/ui
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { toast } from "@/components/ui/use-toast";
 import { Checkbox } from "@/components/ui/checkbox";
+
+// import use toast hook
+import { useToast } from "@/hooks/use-toast";
 
 // Import hooks from the tanstack/react-query
 import { useMutation } from "@tanstack/react-query";
@@ -87,6 +89,8 @@ function RegisterForm({
 
   // Use the useRouter hook to get the router
   const router = useRouter();
+
+  const { toast } = useToast();
 
   // Create a state to manage the loading
   const [loading, setLoading] = useState<boolean>(false);
