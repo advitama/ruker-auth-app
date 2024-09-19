@@ -59,7 +59,7 @@ function ConfirmEmailForm() {
   const { data, isFetched } = useQuery({
     queryKey: ["profile"],
     queryFn: async () => {
-      const response: User = await AUTH_API.get("/profile");
+      const response: User = await AUTH_API.get("/user/profile");
       return response;
     },
   });

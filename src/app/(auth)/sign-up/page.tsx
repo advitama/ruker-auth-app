@@ -23,7 +23,7 @@ export default async function SignUpPage() {
   const posthog = PostHogClient();
   const googleAuthflagEnabled = await posthog.isFeatureEnabled(
     "google-auth",
-    "user distinct id"
+    "anonymous"
   );
 
   return (

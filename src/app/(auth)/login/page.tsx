@@ -22,7 +22,7 @@ export default async function LoginPage() {
     const posthog = PostHogClient();
     const googleAuthflagEnabled = await posthog.isFeatureEnabled(
       "google-auth",
-      "user distinct id"
+      "anonymous"
     );
 
   return (

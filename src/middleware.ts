@@ -24,7 +24,7 @@ export default async function middleware(req: NextRequest) {
   AUTH_API.defaults.headers.Authorization = `Bearer ${accessToken}`;
 
   try {
-    const response: User = await AUTH_API.get("/profile");
+    const response: User = await AUTH_API.get("/user/profile");
     const isVerified = response.verified;
 
     if (!isVerified) {
