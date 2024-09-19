@@ -1,5 +1,8 @@
 "use client";
 
+// Import react hooks
+import { useState, useEffect } from "react";
+
 // Import the env object from the config/env
 import { env } from "@/config/env";
 
@@ -42,19 +45,6 @@ const formSchema = z.object({
   verification_number: z.string(),
 });
 
-/*
- * ConfirmEmailForm component
- * This component is used to verify the email address of the user
- * It uses the useQuery hook to fetch the user profile data
- * It uses the useMutation hook to verify the email address
- * It uses the useForm hook to handle the form state
- * It uses the zodResolver hook to validate the form data
- * It uses the AUTH_API axios instance to make the API request
- * It uses the getAccessToken hook to get the access token
- * It uses the toast hook to show the toast message
- * It uses the Form, FormControl, FormField, FormItem, FormLabel, FormMessage, Input, Button components from the shadcn/ui
- * onResendConfirmationEmail function is used to resend the confirmation email
- */
 function ConfirmEmailForm() {
   const { data, isFetched } = useQuery({
     queryKey: ["profile"],
@@ -103,13 +93,52 @@ function ConfirmEmailForm() {
     });
   };
 
+  // Countdown state for resend button
+  const [countdown, setCountdown] = useState(0);
+  const countdownTime = 60; // Countdown duration in seconds
+
+  // Function to calculate remaining time
+  const calculateRemainingTime = () => {
+    const resendTime = localStorage.getItem("resendTime");
+    if (resendTime) {
+      const savedTime = parseInt(resendTime, 10);
+      const currentTime = Math.floor(Date.now() / 1000);
+      const timeDiff = currentTime - savedTime;
+      if (timeDiff < countdownTime) {
+        return countdownTime - timeDiff; // Return remaining time
+      }
+    }
+    return 0; // If time has passed, no countdown
+  };
+
+  useEffect(() => {
+    const remainingTime = calculateRemainingTime();
+    if (remainingTime > 0) {
+      setCountdown(remainingTime);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (countdown > 0) {
+      const timer = setInterval(() => {
+        setCountdown((prev) => prev - 1);
+      }, 1000);
+      return () => clearInterval(timer);
+    }
+  }, [countdown]);
+
   const onResendConfirmationEmail = async () => {
+    if (countdown > 0) return;
+
     AUTH_API.get("/resend-confirmation-email")
       .then(() => {
         toast({
           title: "Resend Confirmation Email",
           description: "Confirmation email sent successfully",
         });
+        const currentTime = Math.floor(Date.now() / 1000); // Current timestamp in seconds
+        localStorage.setItem("resendTime", currentTime.toString()); // Store the time in localStorage
+        setCountdown(countdownTime); // Start countdown after resending
       })
       .catch((error) => {
         toast({
@@ -167,13 +196,15 @@ function ConfirmEmailForm() {
         </form>
       </Form>
       <div className="text-center text-sm text-muted-foreground">
-        {/* eslint-disable-next-line react/no-unescaped-entities */}
         Didn't receive the code?{" "}
         <button
           onClick={onResendConfirmationEmail}
           className="font-medium text-primary hover:underline"
+          disabled={countdown > 0} // Disable button during countdown
         >
-          Resend confirmation email
+          {countdown > 0
+            ? `Resend email in ${countdown}s`
+            : "Resend confirmation email"}
         </button>
       </div>
     </>
