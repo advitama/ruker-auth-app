@@ -1,7 +1,7 @@
 /* eslint-disable react/no-unescaped-entities */
 import type { Metadata } from "next";
 import TypingAnimation from "@/components/magicui/typing-animation";
-import ConfirmEmailForm from "@/features/confirm-email/components/form/confirm-email";
+import ConfirmEmailForm from "@/lib/features/confirm-email/components/form/confirm-email";
 
 export const metadata: Metadata = {
   title: "Verify your Email",

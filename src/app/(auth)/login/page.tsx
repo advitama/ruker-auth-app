@@ -6,7 +6,7 @@ import type { Metadata } from "next";
 import PostHogClient from "@/lib/posthog";
 
 // Import LoginForm from the forms
-import LoginForm from "@/features/login/components/form/login";
+import LoginForm from "@/lib/features/login/components/form/login";
 
 export const metadata: Metadata = {
   title: "Login",
@@ -19,11 +19,11 @@ export const metadata: Metadata = {
  * It also checks if the google-auth feature flag is enabled
  */
 export default async function LoginPage() {
-    const posthog = PostHogClient();
-    const googleAuthflagEnabled = await posthog.isFeatureEnabled(
-      "google-auth",
-      "anonymous"
-    );
+  const posthog = PostHogClient();
+  const googleAuthflagEnabled = await posthog.isFeatureEnabled(
+    "google-auth",
+    "anonymous"
+  );
 
   return (
     <>
