@@ -5,6 +5,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
+import Placeholder from "@/assets/svg/placeholder.svg";
+
 const queryClient = new QueryClient();
 
 export default function AuthLayout({
@@ -22,7 +24,7 @@ export default function AuthLayout({
         </div>
         <div className="hidden bg-muted lg:block">
           <Image
-            src="/placeholder.svg"
+            src={Placeholder}
             alt="Image"
             width="1920"
             height="1080"

@@ -43,6 +43,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 // icon
 import { LoaderCircle } from "lucide-react";
+import GoogleIcon from "@/assets/svg/Google.svg";
 
 // Import types
 import { Authenticated } from "@/types/auth";
@@ -229,7 +230,7 @@ function LoginForm({
               className="w-full"
             >
               <Image
-                src="/Google.svg"
+                src={GoogleIcon}
                 alt="Google"
                 width={16}
                 height={16}

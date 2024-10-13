@@ -44,6 +44,7 @@ import { Authenticated } from "@/types/auth";
 
 // icon
 import { LoaderCircle } from "lucide-react";
+import GoogleIcon from "@/assets/svg/Google.svg";
 
 // Define the schema for the form
 const formSchema = z
@@ -298,7 +299,7 @@ function RegisterForm({
               className="w-full"
             >
               <Image
-                src="/Google.svg"
+                src={GoogleIcon}
                 alt="Google"
                 width={16}
                 height={16}
