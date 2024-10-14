@@ -63,8 +63,8 @@ function ConfirmEmailForm() {
 
   const { mutateAsync, isPending } = useMutation({
     mutationFn: async (data: { id: string; verification_number: string }) => {
-      await AUTH_API.post("confirm-email", data).catch((error) => {
-        throw error.response.data;
+      await AUTH_API.post("/confirm-email", data).catch((error) => {
+         throw new Error((error as Error).message);
       });
     },
     onSuccess: () => {
@@ -196,7 +196,7 @@ function ConfirmEmailForm() {
         </form>
       </Form>
       <div className="text-center text-sm text-muted-foreground">
-        Didn`&apos;`t receive the code?{" "}
+        Didn&apos;t receive the code?{" "}
         <button
           onClick={onResendConfirmationEmail}
           className="font-medium text-primary hover:underline"
