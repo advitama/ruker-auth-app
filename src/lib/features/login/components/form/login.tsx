@@ -88,7 +88,7 @@ function LoginForm({
         const response: Authenticated = await AUTH_API.post("/login", value);
         createSession(response.access_token, value.remember || false);
       } catch (error) {
-        throw new Error((error as any).response?.data?.message);
+        throw new Error((error as Error).message);
       }
     },
     onSuccess: () => {
@@ -97,6 +97,7 @@ function LoginForm({
         description:
           "You have successfully logged in to your account. Welcome back!",
       });
+      router.push(env.NEXT_PUBLIC_DASHBOARD_APP_URL);
     },
     onError: (error: Error) => {
       form.setError("email", {
@@ -112,12 +113,10 @@ function LoginForm({
         description: (
           <>
             <p>
-              {/* eslint-disable-next-line react/no-unescaped-entities */}
-              We couldn't log you in. Please check your email and password.
+              We couldn&apos;t log you in. Please check your email and
+              password.
             </p>
-            <p className="text-red-500 font-semibold mt-2">
-              {(error as Error).message}
-            </p>
+            <p className="text-red-500 font-semibold mt-2">{error.message}</p>
           </>
         ),
       });

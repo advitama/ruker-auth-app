@@ -82,7 +82,7 @@ export function ForgotPasswordForm() {
         <CardHeader>
           <CardTitle>Check Your Email</CardTitle>
           <CardDescription>
-            We've sent a password reset link to your email address.
+            We`&apos;`ve sent a password reset link to your email address.
           </CardDescription>
         </CardHeader>
         <CardFooter>
@@ -99,8 +99,8 @@ export function ForgotPasswordForm() {
       <CardHeader className="space-y-1 text-center">
         <CardTitle className="text-2xl font-bold">Forgot Password</CardTitle>
         <CardDescription>
-          Enter your email address and we'll send you a link to reset your
-          password.
+          Enter your email address and we`&apos;`ll send you a link to reset
+          your password.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -126,7 +126,7 @@ export function ForgotPasswordForm() {
                       />
                     </FormControl>
                     <FormDescription>
-                      We'll send you a password reset link to this email
+                      We`&apos;`ll send you a password reset link to this email
                       address.
                     </FormDescription>
                     <FormMessage />

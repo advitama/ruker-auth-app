@@ -4,9 +4,6 @@ import { env } from "@/config/env";
 import axios, { InternalAxiosRequestConfig } from "axios";
 import { getAccessToken } from "@/utils/functions/session";
 
-// import use toast hook
-import { useToast } from "@/hooks/use-toast";
-
 const AUTH_API = axios.create({
   baseURL: env.NEXT_PUBLIC_AUTH_API_URL,
   headers: {
@@ -34,14 +31,8 @@ AUTH_API.interceptors.response.use(
   },
   (error) => {
     const message = error.response?.data?.message || error.message;
-    const { toast } = useToast();
-
-    toast({
-      title: "Error",
-      description: message,
-    });
-
-    return Promise.reject(error);
+    // Return the error message to be handled by the component
+    return Promise.reject(new Error(message));
   }
 );
 

@@ -111,7 +111,7 @@ function RegisterForm({
           router.push("/verify-email");
         });
       } catch (error) {
-        throw new Error((error as any).response?.data?.message);
+        throw new Error((error as Error).message);
       }
     },
     onError: (error: Error) => {

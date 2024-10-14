@@ -1,6 +1,6 @@
 /* eslint-disable react/no-unescaped-entities */
 import type { Metadata } from "next";
-import TypingAnimation from "@/components/magicui/typing-animation";
+import TypingAnimation from "@/components/ui/typing-animation";
 import ConfirmEmailForm from "@/lib/features/confirm-email/components/form/confirm-email";
 
 export const metadata: Metadata = {

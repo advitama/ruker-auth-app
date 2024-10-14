@@ -112,9 +112,9 @@ export function ResetPasswordForm({ token }: { token: string }) {
   });
 
   // Get the credential from the data
-  const credential: {
+  const credential = data as unknown as {
     message: string;
-  } = data as any;
+  };
 
   // Create a function called onSubmit that takes values as an argument
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
