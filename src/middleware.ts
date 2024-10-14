@@ -5,7 +5,11 @@ import { NextRequest, NextResponse } from "next/server";
 
 const routes = {
   protected: ["/verify-email"],
-  public: ["/login", "/sign-up", "/forgot-password"],
+  public: [
+    `${env.NEXT_PUBLIC_BASE_PATH}/login`,
+    `${env.NEXT_PUBLIC_BASE_PATH}/sign-up`,
+    `${env.NEXT_PUBLIC_BASE_PATH}/forgot-password`,
+  ],
 };
 
 export default async function middleware(req: NextRequest) {
@@ -15,8 +19,10 @@ export default async function middleware(req: NextRequest) {
   const accessToken = req.cookies.get("access_token")?.value;
 
   if (!accessToken) {
-    if (isProtectedRoute && pathname !== "/login") {
-      return NextResponse.redirect(new URL("/login", req.nextUrl));
+    if (isProtectedRoute && pathname !== `${env.NEXT_PUBLIC_BASE_PATH}/login`) {
+      return NextResponse.redirect(
+        new URL(`${env.NEXT_PUBLIC_BASE_PATH}/login`, req.nextUrl)
+      );
     }
     return NextResponse.next();
   }
@@ -43,8 +49,10 @@ export default async function middleware(req: NextRequest) {
     }
   } catch (error) {
     console.error("Error fetching profile:", error);
-    if (isProtectedRoute && pathname !== "/login") {
-      return NextResponse.redirect(new URL("/login", req.nextUrl));
+    if (isProtectedRoute && pathname !== `${env.NEXT_PUBLIC_BASE_PATH}/login`) {
+      return NextResponse.redirect(
+        new URL(`${env.NEXT_PUBLIC_BASE_PATH}/login`, req.nextUrl)
+      );
     }
   }
 
