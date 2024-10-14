@@ -14,7 +14,7 @@ export async function createSession(
     expires: is_remember
       ? new Date(Date.now() + 1000 * 60 * 60 * 24 * 7) // Cookie expires in 7 days if "Remember me" is checked
       : undefined, // Session cookie if "Remember me" is not checked
-    sameSite: "lax",
+    sameSite: "none",
     path: "/", // Cookie is available across the entire site
     domain: env.NEXT_PUBLIC_BASE_DOMAIN, // Set the domain to the parent domain, allowing access across subdomains (example '.ruker.id')
   });
