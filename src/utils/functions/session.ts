@@ -16,7 +16,7 @@ export async function createSession(
       : undefined, // Session cookie if "Remember me" is not checked
     sameSite: "lax",
     path: "/", // Cookie is available across the entire site
-    domain: env.BASE_DOMAIN, // Set the domain to the parent domain, allowing access across subdomains (example '.ruker.id')
+    domain: env.NEXT_PUBLIC_BASE_DOMAIN, // Set the domain to the parent domain, allowing access across subdomains (example '.ruker.id')
   });
 }
 
