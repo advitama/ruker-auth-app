@@ -86,7 +86,7 @@ function LoginForm({
     mutationFn: async (value: z.infer<typeof formSchema>) => {
       try {
         const response: Authenticated = await AUTH_API.post("/login", value);
-        createSession(response.access_token, value.remember || false);
+        await createSession(response.access_token, value.remember || false);
       } catch (error) {
         throw new Error((error as Error).message);
       }
