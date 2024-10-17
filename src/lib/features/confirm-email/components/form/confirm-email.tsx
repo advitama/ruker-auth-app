@@ -39,7 +39,7 @@ import { useToast } from "@/hooks/use-toast";
 import { LoaderCircle } from "lucide-react";
 
 // Import types
-import { User } from "@/types/auth";
+import type { Profile } from "@/types/profile";
 
 const formSchema = z.object({
   verification_number: z.string(),
@@ -49,7 +49,7 @@ function ConfirmEmailForm() {
   const { data, isFetched } = useQuery({
     queryKey: ["profile"],
     queryFn: async () => {
-      const response: User = await AUTH_API.get("/user/profile");
+      const response: Profile = await AUTH_API.get("/user/profile");
       return response;
     },
   });

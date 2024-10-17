@@ -52,6 +52,7 @@ const formSchema = z
     firstName: z.string(),
     lastName: z.string(),
     email: z.string().email(),
+    username: z.string(),
     password: z
       .string()
       .min(8, { message: "Be at least 8 characters long" })
@@ -69,6 +70,10 @@ const formSchema = z
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",
     path: ["confirmPassword"],
+  })
+  .refine((data) => data.isAgreed === true, {
+    message: "You must agree to the terms of service.",
+    path: ["isAgreed"],
   });
 
 /*
@@ -103,6 +108,7 @@ function RegisterForm({
         const response: Authenticated = await AUTH_API.post("/register", {
           first_name: values.firstName,
           last_name: values.lastName,
+          username: values.username,
           email: values.email,
           password: values.password,
         });
@@ -202,6 +208,25 @@ function RegisterForm({
                     type="email"
                     placeholder="johndoe@example.com"
                     autoComplete="email"
+                    required
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="username"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Username</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    type="text"
+                    placeholder="johndoe"
+                    autoComplete="username"
                     required
                   />
                 </FormControl>

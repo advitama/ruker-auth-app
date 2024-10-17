@@ -113,8 +113,7 @@ function LoginForm({
         description: (
           <>
             <p>
-              We couldn&apos;t log you in. Please check your email and
-              password.
+              We couldn&apos;t log you in. Please check your email and password.
             </p>
             <p className="text-red-500 font-semibold mt-2">{error.message}</p>
           </>
@@ -123,14 +122,14 @@ function LoginForm({
     },
   });
 
-  // Define the onSubmit function
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    await mutateAsync(values).then(() => {
-      router.push(env.NEXT_PUBLIC_DASHBOARD_APP_URL);
-    });
+    try {
+      await mutateAsync(values);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
-  // Define the onGoogleLogin function
   const onGoogleLogin = async () => {
     setLoading(true);
   };

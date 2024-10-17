@@ -61,9 +61,7 @@ export function ForgotPasswordForm() {
   // Use the useMutation hook to create a mutation
   const { mutateAsync, isPending, error } = useMutation({
     mutationFn: async (data: { email: string }) => {
-      await AUTH_API.post("/forgot-password", data).catch((error) => {
-        throw new Error(error.response.data.message);
-      });
+      await AUTH_API.post("/reset-password/forgot", data);
     },
     onSuccess: () => {
       setIsSent(true);
@@ -109,7 +107,9 @@ export function ForgotPasswordForm() {
             <div className="space-y-4">
               {error && (
                 <Alert variant="destructive">
-                  <AlertDescription>{error.message}</AlertDescription>
+                  <AlertDescription>
+                    {error?.message || "An error occurred."}
+                  </AlertDescription>
                 </Alert>
               )}
               <FormField
@@ -134,7 +134,7 @@ export function ForgotPasswordForm() {
                 )}
               />
 
-              <Button type="submit" className="w-full" disabled={false}>
+              <Button type="submit" className="w-full" disabled={isPending}>
                 {isPending ? "Sending..." : "Send Reset Link"}
               </Button>
             </div>

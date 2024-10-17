@@ -27,11 +27,15 @@ AUTH_API.interceptors.request.use(
 
 AUTH_API.interceptors.response.use(
   (response) => {
-    return response.data;
+    return response.data.data;
   },
   (error) => {
+    const status = error.response?.status;
     const message = error.response?.data?.message || error.message;
-    // Return the error message to be handled by the component
+
+    if (status === 401) {
+    }
+
     return Promise.reject(new Error(message));
   }
 );

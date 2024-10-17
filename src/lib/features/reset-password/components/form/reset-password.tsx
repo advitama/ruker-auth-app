@@ -1,13 +1,11 @@
 "use client";
 
-// Import hooks
 import { useRouter } from "next/navigation";
-import { useMutation, useQuery } from "@tanstack/react-query";
-
-// Import API
+import {
+  // useMutation,
+  useQuery,
+} from "@tanstack/react-query";
 import AUTH_API from "@/lib/api/auth";
-
-// Import components
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -31,12 +29,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-
-// import use toast hook
 import { useToast } from "@/hooks/use-toast";
-
-// Import icons
-import { ArrowLeft, LoaderCircle } from "lucide-react";
+import { ArrowLeft, 
+  // LoaderCircle
+ } from "lucide-react";
 
 // Define the schema for the form
 const formSchema = z
@@ -59,70 +55,102 @@ const formSchema = z
     path: ["confirmPassword"],
   });
 
-/*
- * The ResetPasswordForm component is a form that allows users to reset their password.
- * It uses the useForm hook to create a form, and the zodResolver to validate the form.
- * The onSubmit function is called when the form is submitted.
- */
+// Define the expected response structure for verifying the reset token
+interface VerifyResetTokenResponse {
+  message: string; // Assuming the response contains a message field
+}
+
 export function ResetPasswordForm({ token }: { token: string }) {
-  // Use the useForm hook to create a form
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
   });
 
-  // Use the useRouter hook to get the router object
   const router = useRouter();
-
   const { toast } = useToast();
 
-  // Use the useQuery hook to fetch
-  const { data } = useQuery({
+  const {
+    // data,
+    isLoading,
+    error: queryError,
+  } = useQuery({
     queryKey: ["verify-reset-token", token],
-    queryFn: () => {
-      const response = AUTH_API.get(`/verify-reset-token?token=${token}`);
-      return response;
+    queryFn: async () => {
+      await AUTH_API.get<VerifyResetTokenResponse>(
+        `/verify-reset-token?token=${token}`
+      )
+        .then((response) => {
+          return response.data;
+        })
+        .catch(() => {
+          toast({
+            title: "Token Verification Failed",
+            description: "The reset token is invalid or has expired.",
+          });
+        });
     },
   });
 
-  // Use the useMutation hook to create a mutation
-  const { mutateAsync, isPending, error } = useMutation({
-    mutationFn: async ({
-      id,
-      key,
-      password,
-    }: {
-      id: string;
-      key: string;
-      password: string;
-    }) => {
-      const response = await AUTH_API.post("/reset-password", {
-        id,
-        key,
-        password,
-      });
-      return response.data;
-    },
-    onSuccess: () => {
-      toast({
-        title: "Password Reset",
-        description: "Your password has been reset successfully.",
-      });
-      router.push("/login");
-    },
-  });
+  // const { mutateAsync, isPending, error } = useMutation({
+  //   mutationFn: async ({
+  //     id,
+  //     key,
+  //     password,
+  //   }: {
+  //     id: string;
+  //     key: string;
+  //     password: string;
+  //   }) => {
+  //     const response = await AUTH_API.post("/reset-password", {
+  //       id,
+  //       key,
+  //       password,
+  //     });
+  //     return response.data;
+  //   },
+  //   onSuccess: () => {
+  //     toast({
+  //       title: "Password Reset",
+  //       description: "Your password has been reset successfully.",
+  //     });
+  //     router.push("/login");
+  //   },
+  // });
 
-  // Get the credential from the data
-  const credential = data as unknown as {
-    message: string;
-  };
+  // Handle the loading state and the case when `data` is not yet available
+  if (isLoading) {
+    return <div>Loading...</div>; // You can replace this with a loading spinner or placeholder
+  }
 
-  // Create a function called onSubmit that takes values as an argument
+  // Handle error when fetching data
+  if (queryError) {
+    return (
+      <Alert variant="destructive">
+        <AlertDescription>{queryError.message}</AlertDescription>
+      </Alert>
+    );
+  }
+
+  // const credential = data?.message ? data.message.split(":") : null;
+
+  // Ensure `credential` is defined before using it
+  // if (!credential) {
+  // return <div>Error: Invalid token</div>; // Handle invalid token case
+  // }
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    const [id, key] = credential.message.split(":");
-    await mutateAsync({
-      id,
-      key,
-      password: values.password,
+    // const [id, key] = credential;
+    // await mutateAsync({
+    //   id,
+    //   key,
+    //   password: values.password,
+    // });
+    toast({
+      title: "You submitted the following values:",
+      description: (
+        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
+          <code className="text-white">{JSON.stringify(values, null, 2)}</code>
+        </pre>
+      ),
     });
   };
 
@@ -138,11 +166,11 @@ export function ResetPasswordForm({ token }: { token: string }) {
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <div className="space-y-4">
-              {error && (
+              {/* {error && (
                 <Alert variant="destructive">
                   <AlertDescription>{error.message}</AlertDescription>
                 </Alert>
-              )}
+              )} */}
               <FormField
                 control={form.control}
                 name="password"
@@ -160,7 +188,7 @@ export function ResetPasswordForm({ token }: { token: string }) {
                     </FormControl>
                     <FormDescription>
                       Password must be at least 8 characters long and contain at
-                      least one letter, one number and one special character.
+                      least one letter, one number, and one special character.
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -185,7 +213,7 @@ export function ResetPasswordForm({ token }: { token: string }) {
                 )}
               />
 
-              <Button type="submit" className="w-full" disabled={false}>
+              {/* <Button type="submit" className="w-full" disabled={isPending}>
                 {isPending ? (
                   <>
                     <LoaderCircle className="animate-spin mr-2 h-4 w-4" />
@@ -194,7 +222,7 @@ export function ResetPasswordForm({ token }: { token: string }) {
                 ) : (
                   "Reset Password"
                 )}
-              </Button>
+              </Button> */}
             </div>
           </form>
         </Form>

@@ -1,25 +1,35 @@
 import { env } from "./config/env";
-import { User } from "@/types/auth";
 import AUTH_API from "./lib/api/auth";
+import type { Profile } from "@/types/profile";
 import { NextRequest, NextResponse } from "next/server";
 
 const routes = {
-  protected: ["/verify-email"],
+  protected: [`${env.NEXT_PUBLIC_BASE_PATH}/verify-email`],
   public: [
     `${env.NEXT_PUBLIC_BASE_PATH}/login`,
     `${env.NEXT_PUBLIC_BASE_PATH}/sign-up`,
     `${env.NEXT_PUBLIC_BASE_PATH}/forgot-password`,
+    `${env.NEXT_PUBLIC_BASE_PATH}/reset-password`,
   ],
 };
 
+const isRouteProtected = (pathname: string) => routes.protected.includes(pathname);
+const isRoutePublic = (pathname: string) => routes.public.includes(pathname);
+
+async function fetchUserProfile(accessToken: string): Promise<Profile> {
+  AUTH_API.defaults.headers.Authorization = `Bearer ${accessToken}`;
+  return await AUTH_API.get("/user/profile");
+}
+
 export default async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
-  const isProtectedRoute = routes.protected.includes(pathname);
-  const isPublicRoute = routes.public.includes(pathname);
   const accessToken = req.cookies.get("access_token")?.value;
 
   if (!accessToken) {
-    if (isProtectedRoute && pathname !== `${env.NEXT_PUBLIC_BASE_PATH}/login`) {
+    if (
+      isRouteProtected(pathname) &&
+      pathname !== `${env.NEXT_PUBLIC_BASE_PATH}/login`
+    ) {
       return NextResponse.redirect(
         new URL(`${env.NEXT_PUBLIC_BASE_PATH}/login`, req.nextUrl)
       );
@@ -27,17 +37,15 @@ export default async function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  AUTH_API.defaults.headers.Authorization = `Bearer ${accessToken}`;
-
   try {
-    const response: User = await AUTH_API.get("/user/profile");
+    const response = await fetchUserProfile(accessToken);
     const isVerified = response.verified;
 
     if (!isVerified) {
-      if (isProtectedRoute && pathname !== "/verify-email") {
+      if (isRouteProtected(pathname) && pathname !== "/verify-email") {
         return NextResponse.redirect(new URL("/verify-email", req.nextUrl));
       }
-      if (isPublicRoute && pathname !== "/verify-email") {
+      if (isRoutePublic(pathname) && pathname !== "/verify-email") {
         return NextResponse.redirect(new URL("/verify-email", req.nextUrl));
       }
     }
@@ -49,7 +57,10 @@ export default async function middleware(req: NextRequest) {
     }
   } catch (error) {
     console.error("Error fetching profile:", error);
-    if (isProtectedRoute && pathname !== `${env.NEXT_PUBLIC_BASE_PATH}/login`) {
+    if (
+      isRouteProtected(pathname) &&
+      pathname !== `${env.NEXT_PUBLIC_BASE_PATH}/login`
+    ) {
       return NextResponse.redirect(
         new URL(`${env.NEXT_PUBLIC_BASE_PATH}/login`, req.nextUrl)
       );
