@@ -138,10 +138,10 @@ function LoginForm({
     <>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
-          <div className="grid gap-2">
+          <div className="grid gap-2 text-left">
             <FormField
-              control={form.control}
               name="email"
+              control={form.control}
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Email</FormLabel>
@@ -149,7 +149,7 @@ function LoginForm({
                     <Input
                       {...field}
                       type="email"
-                      placeholder="johndoe@example.com"
+                      placeholder="me@example.com"
                       required
                     />
                   </FormControl>
@@ -158,10 +158,10 @@ function LoginForm({
               )}
             />
           </div>
-          <div className="grid gap-2">
+          <div className="grid gap-2 text-left">
             <FormField
-              control={form.control}
               name="password"
+              control={form.control}
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Password</FormLabel>
@@ -210,11 +210,19 @@ function LoginForm({
             </Button>
           ) : (
             <Button type="submit" className="w-full">
-              Login
+              Sign In with Email
             </Button>
           )}
         </form>
       </Form>
+      <div className="relative">
+        <div className="absolute inset-0 flex items-center">
+          <span className="w-full border-t" />
+        </div>
+        <div className="relative flex justify-center text-xs uppercase mt-1 mb-1">
+          <span className="bg-background px-2 text-muted-foreground">Or</span>
+        </div>
+      </div>
       {googleAuthFlagEnabled && (
         <>
           {loading ? (
@@ -234,7 +242,7 @@ function LoginForm({
                 height={16}
                 className="mr-2"
               />
-              Login with Google
+              Sign In with Google
             </Button>
           )}
         </>

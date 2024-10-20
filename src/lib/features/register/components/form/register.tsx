@@ -1,7 +1,6 @@
 "use client";
 
 // Import components from the Next.js
-import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
@@ -17,7 +16,6 @@ import { createSession } from "@/utils/functions/session";
 // Import components from the shadcn/ui
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 
 // import use toast hook
 import { useToast } from "@/hooks/use-toast";
@@ -62,19 +60,14 @@ const formSchema = z
         message: "Contain at least one special character.",
       })
       .trim(),
-    confirmPassword: z
-      .string()
-      .min(8, { message: "Be at least 8 characters long" }),
-    isAgreed: z.boolean().optional(),
+    // confirmPassword: z
+    //   .string()
+    //   .min(8, { message: "Be at least 8 characters long" }),
   })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords do not match",
-    path: ["confirmPassword"],
-  })
-  .refine((data) => data.isAgreed === true, {
-    message: "You must agree to the terms of service.",
-    path: ["isAgreed"],
-  });
+  // .refine((data) => data.password === data.confirmPassword, {
+  //   message: "Passwords do not match",
+  //   path: ["confirmPassword"],
+  // });
 
 /*
  * The RegisterForm component is a form that allows users to sign up.
@@ -157,11 +150,14 @@ function RegisterForm({
   return (
     <>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-2">
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="grid gap-2 text-left"
+        >
           <div className="grid grid-cols-2 gap-4">
             <FormField
-              control={form.control}
               name="firstName"
+              control={form.control}
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>First name</FormLabel>
@@ -178,8 +174,8 @@ function RegisterForm({
               )}
             />
             <FormField
-              control={form.control}
               name="lastName"
+              control={form.control}
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Last name</FormLabel>
@@ -197,8 +193,8 @@ function RegisterForm({
             />
           </div>
           <FormField
-            control={form.control}
             name="email"
+            control={form.control}
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Email</FormLabel>
@@ -216,8 +212,8 @@ function RegisterForm({
             )}
           />
           <FormField
-            control={form.control}
             name="username"
+            control={form.control}
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Username</FormLabel>
@@ -235,8 +231,8 @@ function RegisterForm({
             )}
           />
           <FormField
-            control={form.control}
             name="password"
+            control={form.control}
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Password</FormLabel>
@@ -258,9 +254,9 @@ function RegisterForm({
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
+          {/* <FormField
             name="confirmPassword"
+            control={form.control}
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Confirm Password</FormLabel>
@@ -275,29 +271,7 @@ function RegisterForm({
                 <FormMessage />
               </FormItem>
             )}
-          />
-          <FormField
-            control={form.control}
-            name="isAgreed"
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <Checkbox
-                    className="mr-1"
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
-                </FormControl>
-                <FormLabel>
-                  I agree to the{" "}
-                  <Link href="#" className="text-primary">
-                    terms of service
-                  </Link>
-                </FormLabel>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          /> */}
           <div className="mt-2 space-y-3">
             {isPending ? (
               <Button className="w-full" disabled>
@@ -311,6 +285,14 @@ function RegisterForm({
           </div>
         </form>
       </Form>
+      <div className="relative">
+        <div className="absolute inset-0 flex items-center">
+          <span className="w-full border-t" />
+        </div>
+        <div className="relative flex justify-center text-xs uppercase mt-1 mb-1">
+          <span className="bg-background px-2 text-muted-foreground">Or</span>
+        </div>
+      </div>
       {googleAuthflagEnabled && (
         <>
           {loading ? (
