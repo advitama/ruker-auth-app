@@ -21,7 +21,7 @@ export const metadata: Metadata = {
  */
 export default async function SignUpPage() {
   const posthog = PostHogClient();
-  const googleAuthflagEnabled = await posthog.isFeatureEnabled(
+  const googleAuthFlagEnabled = await posthog.isFeatureEnabled(
     "google-auth",
     "anonymous"
   );
@@ -36,7 +36,7 @@ export default async function SignUpPage() {
           <p className="text-sm text-muted-foreground">
             Enter your email below to create your account
           </p>
-          <RegisterForm googleAuthflagEnabled={googleAuthflagEnabled} />
+          <RegisterForm googleAuthFlagEnabled={googleAuthFlagEnabled} />
         </div>
         <p className="px-8 text-center text-sm text-muted-foreground">
           By clicking continue, you agree to our{" "}
@@ -55,6 +55,12 @@ export default async function SignUpPage() {
           </Link>
           .
         </p>
+        <div className="md:hidden mt-4 text-center text-sm">
+          Already have an account?{" "}
+          <Link href="/login" className="underline">
+            Sign in
+          </Link>
+        </div>
       </div>
     </>
   );

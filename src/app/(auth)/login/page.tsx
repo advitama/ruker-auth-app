@@ -37,7 +37,7 @@ export default async function LoginPage() {
           </p>
           <LoginForm googleAuthFlagEnabled={googleAuthflagEnabled} />
         </div>
-        <div className="mt-4 text-center text-sm">
+        <div className="md:hidden mt-4 text-center text-sm">
           Don&apos;t have an account?{" "}
           <Link href="/sign-up" className="underline">
             Sign up{" "}

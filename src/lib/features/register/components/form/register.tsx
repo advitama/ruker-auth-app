@@ -1,29 +1,24 @@
 "use client";
 
-// Import components from the Next.js
+// import next components
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 
-// Import hooks from React
+// import hooks
 import { useState } from "react";
-
-// Import the axios instance
-import AUTH_API from "@/lib/api/auth";
-
-// Import createSession
-import { createSession } from "@/utils/functions/session";
-
-// Import components from the shadcn/ui
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-
-// import use toast hook
+import { useForm } from "react-hook-form";
+import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
-
-// Import hooks from the tanstack/react-query
 import { useMutation } from "@tanstack/react-query";
 
-// Import components from the shadcn/ui/form, zod, and react-hook-form
+// import from zod
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+// icons
+import GoogleIcon from "@/assets/svg/Google.svg";
+import { LoaderCircle, Eye, EyeOff } from "lucide-react";
+
+// import components
 import {
   Form,
   FormControl,
@@ -33,85 +28,46 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { z } from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
-// Import types
-import { Authenticated } from "@/types/auth";
+// import function and api
+import AUTH_API from "@/lib/api/auth";
+import { createSession } from "@/utils/functions/session";
 
-// icon
-import { LoaderCircle } from "lucide-react";
-import GoogleIcon from "@/assets/svg/Google.svg";
+// import types
+import type { Authenticated } from "@/types/auth";
+import { RegisterFormSchema } from "@/lib/features/register/schema/register-form";
 
-// Define the schema for the form
-const formSchema = z
-  .object({
-    firstName: z.string(),
-    lastName: z.string(),
-    email: z.string().email(),
-    username: z.string(),
-    password: z
-      .string()
-      .min(8, { message: "Be at least 8 characters long" })
-      .regex(/[a-zA-Z]/, { message: "Contain at least one letter." })
-      .regex(/[0-9]/, { message: "Contain at least one number." })
-      .regex(/[^a-zA-Z0-9]/, {
-        message: "Contain at least one special character.",
-      })
-      .trim(),
-    // confirmPassword: z
-    //   .string()
-    //   .min(8, { message: "Be at least 8 characters long" }),
-  })
-  // .refine((data) => data.password === data.confirmPassword, {
-  //   message: "Passwords do not match",
-  //   path: ["confirmPassword"],
-  // });
+type RegisterFormProps = {
+  googleAuthFlagEnabled?: boolean;
+};
 
-/*
- * The RegisterForm component is a form that allows users to sign up.
- * It uses the useForm hook to create a form, and the zodResolver to validate the form.
- * The onSubmit function is called when the form is submitted.
- * The onGoogleSignUp function is called when the "Sign up with Google" button is clicked.
- * The RegisterForm component takes a googleAuthflagEnabled prop that determines if the "Sign up with Google" button is displayed.
- */
-function RegisterForm({
-  googleAuthflagEnabled,
-}: {
-  googleAuthflagEnabled: boolean | undefined;
-}) {
-  // Use the useForm hook to create a form
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-  });
+export default function RegisterForm({
+  googleAuthFlagEnabled = false,
+}: RegisterFormProps) {
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
-  // Use the useRouter hook to get the router
   const router = useRouter();
-
   const { toast } = useToast();
 
-  // Create a state to manage the loading
-  const [loading, setLoading] = useState<boolean>(false);
+  const form = useForm<z.infer<typeof RegisterFormSchema>>({
+    resolver: zodResolver(RegisterFormSchema),
+  });
 
-  // Create a mutation to handle the sign up
   const { mutateAsync, isPending } = useMutation({
-    mutationFn: async (values: z.infer<typeof formSchema>) => {
-      try {
-        const response: Authenticated = await AUTH_API.post("/register", {
-          first_name: values.firstName,
-          last_name: values.lastName,
-          username: values.username,
-          email: values.email,
-          password: values.password,
-        });
+    mutationFn: async (values: z.infer<typeof RegisterFormSchema>) => {
+      const response: Authenticated = await AUTH_API.post("/register", {
+        first_name: values.firstName,
+        last_name: values.lastName,
+        username: values.username,
+        email: values.email,
+        password: values.password,
+      });
 
-        await createSession(response.access_token, false).then(() => {
-          router.push("/verify-email");
-        });
-      } catch (error) {
-        throw new Error((error as Error).message);
-      }
+      await createSession(response.access_token, false);
+      return response;
     },
     onError: (error: Error) => {
       toast({
@@ -132,32 +88,34 @@ function RegisterForm({
         title: "Account Created Successfully",
         description: "Welcome aboard! Your account has been created 🎉",
       });
+      router.push("/verify-email");
     },
   });
 
-  // Define the onSubmit function
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    await mutateAsync(values).then(() => {
-      router.push("/verify-email");
-    });
+  const onSubmit = (values: z.infer<typeof RegisterFormSchema>) =>
+    mutateAsync(values);
+
+  const onGoogleSignUp = async () => {
+    setIsGoogleLoading(true);
+    // Implement Google sign-up logic here
+    setIsGoogleLoading(false);
   };
 
-  // Define the onGoogleSignUp function
-  const onGoogleSignUp = async () => {
-    setLoading(true);
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
   };
 
   return (
-    <>
+    <div className="space-y-6">
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="grid gap-2 text-left"
+          className="space-y-4 text-left"
         >
           <div className="grid grid-cols-2 gap-4">
             <FormField
-              name="firstName"
               control={form.control}
+              name="firstName"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>First name</FormLabel>
@@ -174,8 +132,8 @@ function RegisterForm({
               )}
             />
             <FormField
-              name="lastName"
               control={form.control}
+              name="lastName"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Last name</FormLabel>
@@ -193,8 +151,8 @@ function RegisterForm({
             />
           </div>
           <FormField
-            name="email"
             control={form.control}
+            name="email"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Email</FormLabel>
@@ -202,7 +160,7 @@ function RegisterForm({
                   <Input
                     {...field}
                     type="email"
-                    placeholder="johndoe@example.com"
+                    placeholder="me@example.com"
                     autoComplete="email"
                     required
                   />
@@ -212,16 +170,15 @@ function RegisterForm({
             )}
           />
           <FormField
-            name="username"
             control={form.control}
+            name="username"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Username</FormLabel>
                 <FormControl>
                   <Input
                     {...field}
-                    type="text"
-                    placeholder="johndoe"
+                    placeholder=""
                     autoComplete="username"
                     required
                   />
@@ -231,94 +188,90 @@ function RegisterForm({
             )}
           />
           <FormField
-            name="password"
             control={form.control}
+            name="password"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Password</FormLabel>
                 <FormControl>
-                  <Input
-                    {...field}
-                    type="password"
-                    placeholder="••••••••"
-                    autoComplete="new-password"
-                    required
-                  />
+                  <div className="relative">
+                    <Input
+                      {...field}
+                      type={showPassword ? "text" : "password"}
+                      placeholder="••••••••"
+                      autoComplete="new-password"
+                      required
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                      onClick={togglePasswordVisibility}
+                      aria-label={
+                        showPassword ? "Hide password" : "Show password"
+                      }
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4 text-gray-500" />
+                      ) : (
+                        <Eye className="h-4 w-4 text-gray-500" />
+                      )}
+                    </Button>
+                  </div>
                 </FormControl>
                 <FormDescription>
                   Password must be at least 8 characters long and contain at
                   least one letter, one number and one special character.
                 </FormDescription>
-
                 <FormMessage />
               </FormItem>
             )}
           />
-          {/* <FormField
-            name="confirmPassword"
-            control={form.control}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Confirm Password</FormLabel>
-                <FormControl>
-                  <Input
-                    {...field}
-                    type="password"
-                    placeholder="••••••••"
-                    required
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          /> */}
-          <div className="mt-2 space-y-3">
+          <Button type="submit" className="w-full" disabled={isPending}>
             {isPending ? (
-              <Button className="w-full" disabled>
-                <LoaderCircle className="animate-spin" />
-              </Button>
+              <LoaderCircle className="animate-spin" />
             ) : (
-              <Button type="submit" className="w-full">
-                Create an account
-              </Button>
+              "Create an account"
             )}
-          </div>
+          </Button>
         </form>
       </Form>
-      <div className="relative">
-        <div className="absolute inset-0 flex items-center">
-          <span className="w-full border-t" />
-        </div>
-        <div className="relative flex justify-center text-xs uppercase mt-1 mb-1">
-          <span className="bg-background px-2 text-muted-foreground">Or</span>
-        </div>
-      </div>
-      {googleAuthflagEnabled && (
+      {googleAuthFlagEnabled && (
         <>
-          {loading ? (
-            <Button variant="outline" className="w-full" disabled>
+          {/* <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-background px-2 text-muted-foreground">
+                Or
+              </span>
+            </div>
+          </div> */}
+          <Button
+            onClick={onGoogleSignUp}
+            variant="outline"
+            className="w-full"
+            disabled={isGoogleLoading}
+          >
+            {isGoogleLoading ? (
               <LoaderCircle className="animate-spin" />
-            </Button>
-          ) : (
-            <Button
-              onClick={onGoogleSignUp}
-              variant="outline"
-              className="w-full"
-            >
-              <Image
-                src={GoogleIcon}
-                alt="Google"
-                width={16}
-                height={16}
-                className="mr-2"
-              />
-              Sign up with Google
-            </Button>
-          )}
+            ) : (
+              <>
+                <Image
+                  src={GoogleIcon}
+                  alt="Google"
+                  width={16}
+                  height={16}
+                  className="mr-2"
+                />
+                Sign Up with Google
+              </>
+            )}
+          </Button>
         </>
       )}
-    </>
+    </div>
   );
 }
-
-export default RegisterForm;
